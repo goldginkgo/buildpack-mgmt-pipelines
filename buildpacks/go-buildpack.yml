@@ -1,0 +1,16 @@
+buildpack-name: go-buildpack
+human-readable-name: Go Buildpack
+input-resource-type: pivnet
+input-resource-source:
+  api_token: ((pivnet-token))
+  product_slug: buildpacks
+  product_version: Go*
+buildpack-regex: go_buildpack-cached-(.*).zip
+buildpack-ls: go_buildpack-cached-*.zip
+test-app-type: git
+test-app-source:
+  uri: https://github.com/cloudfoundry-samples/test-app.git
+  branch: master
+test-app-passed: []
+cf-latest-buildpack-name: custom_go_buildpack_latest
+cf-buildpack-name: custom_go_buildpack

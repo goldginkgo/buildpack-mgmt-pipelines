@@ -1,0 +1,20 @@
+buildpack-name: java-buildpack
+human-readable-name: Java Buildpack
+input-resource-type: pivnet
+input-resource-source:
+  api_token: ((pivnet-token))
+  product_slug: buildpacks
+  product_version: Java*
+buildpack-regex: java-buildpack-offline-(.*).zip
+buildpack-ls: java-buildpack-offline-*.zip
+test-app-type: s3
+test-app-source:
+  bucket: ((aws-bucket))
+  regexp: java-buildpack-test-app/spring-music-(.*).zip
+  access_key_id: ((aws-access-key-id))
+  secret_access_key: ((aws-secret-access-key))
+  region_name: eu-central-1
+test-app-passed:
+- build-spring-music
+cf-latest-buildpack-name: custom_java_buildpack_latest
+cf-buildpack-name: custom_java_buildpack

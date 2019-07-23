@@ -1,0 +1,20 @@
+platform: linux
+image_resource:
+  type: docker-image
+  source:
+    repository: pcfnorm/rootfs
+inputs:
+- name: ci-buildpacks
+- name: buildpack-state-test
+run:
+  path: ci-buildpacks/tasks/promote-buildpacks-on-prod-only-monday/task.sh
+params:
+  FLY_HOST:
+  FLY_TEAM:
+  FLY_USERNAME:
+  FLY_PASSWORD:
+  CF_API_URI:
+  CF_USERNAME:
+  CF_PASSWORD:
+  PIPELINE:
+

@@ -1,0 +1,16 @@
+buildpack-name: staticfile-buildpack
+human-readable-name: Staticfile Buildpack
+input-resource-type: pivnet
+input-resource-source:
+  api_token: ((pivnet-token))
+  product_slug: buildpacks
+  product_version: Staticfile*
+buildpack-regex: staticfile_buildpack-cached-(.*).zip
+buildpack-ls: staticfile_buildpack-cached-*.zip
+test-app-type: git
+test-app-source:
+  uri: https://github.com/cloudfoundry-samples/test-app.git
+  branch: master
+test-app-passed: []
+cf-latest-buildpack-name: custom_staticfile_buildpack_latest
+cf-buildpack-name: custom_staticfile_buildpack

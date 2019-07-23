@@ -1,0 +1,65 @@
+resources:
+- name: spring-music-source
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry-samples/spring-music
+    branch: master
+- name: spring-music-version
+  type: semver
+  source:
+    initial_version: 0.0.0
+    driver: s3
+    access_key_id: ((aws-access-key-id))
+    secret_access_key: ((aws-secret-access-key))
+    region_name: eu-central-1
+    bucket: ((aws-bucket))
+    key: apps/spring-music/version
+
+jobs:
+- name: spring-music-collector
+  plan:
+  - get: spring-music-source
+    trigger: true
+  - put: spring-music-version
+    params: { bump: minor }
+- name: build-spring-music
+  plan:
+  - aggregate:
+    - get: spring-music-source
+      passed:
+      - spring-music-collector
+    - get: spring-music-version
+      trigger: true
+      passed:
+      - spring-music-collector
+  - task: build-test-app
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: java
+          tag: "8"
+      inputs:
+      - name: spring-music-source
+      - name: spring-music-version
+      outputs:
+      - name: java-buildpack-test-app
+      run:
+        path: bash
+        args:
+        - -c
+        - |
+          set -e
+          version=$(cat spring-music-version/version)
+          mkdir -p spring-music/
+          cp -a spring-music-source/* spring-music/
+          cd spring-music
+          ./gradlew clean assemble
+          apt-get update
+          apt-get install --yes zip
+          mkdir -p ../java-buildpack-test-app
+          zip -r ../java-buildpack-test-app/spring-music-$version.zip *
+  - put: java-buildpack-test-app
+    params:
+      file: "java-buildpack-test-app/spring-music-*.zip"

@@ -1,0 +1,16 @@
+buildpack-name: nodejs-buildpack
+human-readable-name: NodeJS Buildpack
+input-resource-type: pivnet
+input-resource-source:
+  api_token: ((pivnet-token))
+  product_slug: buildpacks
+  product_version: NodeJS*
+buildpack-regex: nodejs_buildpack-cached-(.*).zip
+buildpack-ls: nodejs_buildpack-cached-*.zip
+test-app-type: git
+test-app-source:
+  uri: https://github.com/cloudfoundry-samples/cf-sample-app-nodejs.git
+  branch: master
+test-app-passed: []
+cf-latest-buildpack-name: custom_nodejs_buildpack_latest
+cf-buildpack-name: custom_nodejs_buildpack

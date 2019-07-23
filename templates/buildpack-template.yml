@@ -1,0 +1,128 @@
+resources:
+- name: ((buildpack-name))
+  type: ((input-resource-type))
+  source: ((input-resource-source))
+- name: ((buildpack-name))-latest
+  type: s3
+  source:
+    bucket: ((aws-bucket))
+    regexp: latest/((buildpack-name))/((buildpack-regex))
+    access_key_id: ((aws-access-key-id))
+    secret_access_key: ((aws-secret-access-key))
+    region_name: eu-central-1
+- name: ((buildpack-name))-test
+  type: s3
+  source:
+    bucket: ((aws-bucket))
+    regexp: test/((buildpack-name))/((buildpack-regex))
+    access_key_id: ((aws-access-key-id))
+    secret_access_key: ((aws-secret-access-key))
+    region_name: eu-central-1
+- name: ((buildpack-name))-test-app
+  type: ((test-app-type))
+  source: ((test-app-source))
+
+jobs:
+- name: regulator
+  plan:
+  - aggregate:
+    - (( append ))
+    - get: ((buildpack-name))
+      params: { globs: [] }
+
+# Buildpack
+- name: download-((buildpack-name))
+  plan:
+  - get: ((buildpack-name))
+    trigger: true
+    passed:
+    - regulator
+  - put: ((buildpack-name))-latest
+    params:
+      file: ((buildpack-name))/((buildpack-ls))
+- name: stage-((buildpack-name))
+  plan:
+  - aggregate:
+    - get: pcf-pipelines
+    - get: ((buildpack-name))-latest
+      trigger: true
+      passed:
+      - download-((buildpack-name))
+    - get: ((buildpack-name))-test-app
+      passed: ((test-app-passed))
+      params:
+        unpack: true
+    - get: ci-buildpacks
+  - task: upload-buildpack
+    file: pcf-pipelines/tasks/stage-buildpack/task.yml
+    input_mapping: {buildpack: ((buildpack-name))-latest}
+    params:
+      CF_API_URI: ((cf-api-uri))
+      CF_USERNAME: ((cf-username))
+      CF_PASSWORD: ((cf-password))
+      BUILDPACK_NAME: ((cf-latest-buildpack-name))
+  - task: test-buildpack
+    file: ci-buildpacks/tasks/push-app/task.yml
+    input_mapping: {app: ((buildpack-name))-test-app}
+    params:
+      CF_API_URI: ((cf-api-uri))
+      CF_USERNAME: ((cf-username))
+      CF_PASSWORD: ((cf-password))
+      CF_ORGANIZATION: ((cf-organization))
+      CF_SPACE: ((cf-space))
+      BUILDPACK_NAME: ((cf-latest-buildpack-name))
+- name: test-regulator-((buildpack-name))
+  plan:
+  - get: ((buildpack-name))-latest
+    params: { globs: [] }
+    passed:
+    - stage-((buildpack-name))
+- name: promote-((buildpack-name))-to-test
+  plan:
+  - aggregate:
+    - get: pcf-pipelines
+    - get: ((buildpack-name))-latest
+      trigger: true
+      passed:
+      - test-regulator-((buildpack-name))
+  - task: promote buildpack on test
+    file: pcf-pipelines/tasks/promote-buildpack/task.yml
+    params:
+      CF_API_URI: ((cf-api-uri))
+      CF_USERNAME: ((cf-username))
+      CF_PASSWORD: ((cf-password))
+      SOURCE_BUILDPACK_NAME: ((cf-latest-buildpack-name))
+      TARGET_BUILDPACK_NAME: ((cf-buildpack-name))
+  - put: ((buildpack-name))-test
+    params:
+      file: ((buildpack-name))-latest/((buildpack-ls))
+    on_success:
+      put: slack-alert
+      params:
+        text: "[((human-readable-name))] We have updated the `((cf-buildpack-name))` on DEV/TEST. The update will be promoted to PROD next Monday."
+- name: production-regulator-((buildpack-name))
+  plan:
+  - get: ((buildpack-name))-test
+    params: { globs: [] }
+    passed:
+    - promote-((buildpack-name))-to-test
+- name: promote-((buildpack-name))-to-prod
+  plan:
+  - aggregate:
+    - get: pcf-pipelines
+    - get: ((buildpack-name))-test
+      trigger: true
+      passed:
+      - production-regulator-((buildpack-name))
+  - task: upload-buildpack
+    file: pcf-pipelines/tasks/stage-buildpack/task.yml
+    input_mapping: {buildpack: ((buildpack-name))-test}
+    params:
+      CF_API_URI: ((cf-prod-api-uri))
+      CF_USERNAME: ((cf-prod-username))
+      CF_PASSWORD: ((cf-prod-password))
+      BUILDPACK_NAME: ((cf-buildpack-name))
+    on_success:
+      put: slack-alert
+      params:
+        text: "[((human-readable-name))] We have updated the `((cf-buildpack-name))` on PROD."
