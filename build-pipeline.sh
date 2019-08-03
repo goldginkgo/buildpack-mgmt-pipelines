@@ -16,11 +16,12 @@ for vars in $(ls -1 buildpacks/*.yml); do
   rm $TEMP_FILE
 done
 
-for job in $(ls -1 additional/*.yml); do
-  echo "Job: $job"
-  RESULT_TEMP_FILE=$(mktemp)
-  spruce merge $RESULT_FILE $job > $RESULT_TEMP_FILE
-  mv $RESULT_TEMP_FILE $RESULT_FILE
-done
+# build java test app
+# for job in $(ls -1 additional/*.yml); do
+#   echo "Job: $job"
+#   RESULT_TEMP_FILE=$(mktemp)
+#   spruce merge $RESULT_FILE $job > $RESULT_TEMP_FILE
+#   mv $RESULT_TEMP_FILE $RESULT_FILE
+# done
 
 mv $RESULT_FILE buildpack-installation-pipeline.yml

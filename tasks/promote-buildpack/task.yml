@@ -9,7 +9,7 @@ image_resource:
 
 
 inputs:
-- name: pcf-pipelines
+- name: buildpack-mgmt-pipelines
 
 params:
   CF_API_URI:
@@ -20,4 +20,4 @@ params:
   STACKS:
 
 run:
-  path: pcf-pipelines/tasks/promote-buildpack/task.sh
+  path: buildpack-mgmt-pipelines/tasks/promote-buildpack/task.sh
