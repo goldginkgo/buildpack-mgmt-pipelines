@@ -4,10 +4,11 @@ image_resource:
   source:
     repository: pcfnorm/rootfs
 inputs:
-- name: ci-buildpacks
-- name: buildpack-state-test
+- name: buildpack-mgmt-pipelines
+- name: buildpack-mgmt-cmdb
+
 run:
-  path: ci-buildpacks/tasks/promote-buildpacks-on-prod-only-monday/task.sh
+  path: buildpack-mgmt-pipelines/tasks/trigger-update/task.sh
 params:
   FLY_HOST:
   FLY_TEAM:
@@ -17,4 +18,3 @@ params:
   CF_USERNAME:
   CF_PASSWORD:
   PIPELINE:
-

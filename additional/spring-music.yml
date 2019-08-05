@@ -24,7 +24,7 @@ jobs:
     params: { bump: minor }
 - name: build-spring-music
   plan:
-  - aggregate:
+  - in_parallel:
     - get: spring-music-source
       passed:
       - spring-music-collector

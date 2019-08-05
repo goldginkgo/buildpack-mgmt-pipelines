@@ -4,91 +4,55 @@ resource_types:
   source:
     repository: pivotalcf/pivnet-resource
     tag: latest-final
-- name: slack-notification
+
+- name: rocketchat
   type: docker-image
   source:
-    repository: cfcommunity/slack-notification-resource
-    tag: latest
-- name: cron-resource
+    repository: michaellihs/rocket-notify-resource
+
+- name: artifactory
   type: docker-image
   source:
-    repository: cftoolsmiths/cron-resource
+    repository: pivotalservices/artifactory-resource
 
 resources:
-- name: pcf-pipelines
+- name:  buildpack-mgmt-pipelines
   type: git
+  icon: github
   source:
-    uri: https://github.com/pivotal-cf/pcf-pipelines.git
-- name: ci-buildpacks
+    uri: ((buildpack-mgmt-pipelines-url))
+    branch: master
+    username: ((git-username))
+    password: ((git-password))
+    skip_ssl_verification: true
+
+- name: buildpack-mgmt-cmdb
   type: git
+  icon: github
   source:
-    uri: https://github.com/vzickner/ci-buildpacks.git
-- name: schedule
-  type: cron-resource
+    uri: ((buildpack-mgmt-cmdb-url))
+    username: ((git-username))
+    password: ((git-password))
+    skip_ssl_verification: true
+
+- name: rocketchat
+  type: rocketchat
+  icon: chat
   source:
-    expression: "0 16 * * 1"
-    location: "Europe/Berlin"
-- name: first-week-schedule
-  type: cron-resource
-  source:
-    expression: "0 9 1-7 * *"
-    location: "Europe/Berlin"
-- name: second-week-schedule
-  type: cron-resource
-  source:
-    expression: "0 9 8-14 * *"
-    location: "Europe/Berlin"
-- name: slack-alert
-  type: slack-notification
-  source:
-    url: ((slack-webhook-url))
-- name: buildpack-state-test
-  type: s3
-  source:
-    bucket: ((aws-bucket))
-    regexp: buildpack-state-test/state-(.*).txt
-    access_key_id: ((aws-access-key-id))
-    secret_access_key: ((aws-secret-access-key))
-    region_name: eu-central-1
+    url: ((rocket-chat-url))
+    user: ((rocket-chat-username))
+    password: ((rocket-chat-password))
 
 jobs:
-- name: regulator
+- name: trigger-buildpack-update
+  serial_groups: [cc-api]
   plan:
-  - aggregate:
-    - get: schedule
+  - in_parallel:
+    - get: buildpack-mgmt-cmdb
       trigger: true
-- name: test-regulator
-  plan:
-  - aggregate:
-    - get: first-week-schedule
-      trigger: true
-    - get: ci-buildpacks
-  - task: promote-buildpacks-on-test-only-monday
-    file: ci-buildpacks/tasks/promote-buildpacks-on-test-only-monday/task.yml
-    params:
-      FLY_HOST: ((fly-host))
-      FLY_TEAM: ((fly-team))
-      FLY_USERNAME: ((fly-username))
-      FLY_PASSWORD: ((fly-password))
-      CF_API_URI: ((cf-api-uri))
-      CF_USERNAME: ((cf-username))
-      CF_PASSWORD: ((cf-password))
-      PIPELINE: ((pipeline))
-    on_success:
-      put: buildpack-state-test
-      params:
-        file: buildpack-state-test/state-*.txt
-- name: prod-regulator
-  plan:
-  - aggregate:
-    - get: second-week-schedule
-      trigger: true
-    - get: ci-buildpacks
-    - get: buildpack-state-test
-      passed:
-      - test-regulator
-  - task: promote-buildpacks-on-prod-only-monday
-    file: ci-buildpacks/tasks/promote-buildpacks-on-prod-only-monday/task.yml
+    - get: buildpack-mgmt-pipelines
+  - task: cmdb-trigger-buildpack-update
+    file: buildpack-mgmt-pipelines/tasks/trigger-update/task.yml
     params:
       FLY_HOST: ((fly-host))
       FLY_TEAM: ((fly-team))

@@ -1,13 +1,12 @@
+---
 platform: linux
 
 image_resource:
   type: docker-image
   source:
     repository: pcfnorm/rootfs
-    tag: 1.0.28
 
 inputs:
-- name: app
 - name: buildpack-mgmt-pipelines
 
 params:
@@ -17,8 +16,7 @@ params:
   CF_ORG:
   CF_SPACE:
   BUILDPACK_NAME:
-  STACKS:
   APP_NAME:
 
 run:
-  path: buildpack-mgmt-pipelines/tasks/push-app/task.sh
+  path: buildpack-mgmt-pipelines/tasks/validate-app/task.sh
