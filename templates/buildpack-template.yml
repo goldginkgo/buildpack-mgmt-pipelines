@@ -1,3 +1,15 @@
+groups:
+- name: download_buildpack
+  jobs:
+  - regulator
+  - download-((buildpack-name))
+- name: update_buildpack
+  jobs:
+  - trigger-buildpack-update
+  - stage-((buildpack-name))
+  - test-((buildpack-name))
+  - promote-((buildpack-name))
+
 cf_params: &cf_params
   CF_API_URI: ((cf-api-uri))
   CF_USERNAME: ((cf-username))
@@ -9,17 +21,17 @@ cf_params: &cf_params
 resources:
 - name: ((buildpack-name))
   type: ((input-resource-type))
-  #icon: package-variant-closed
+  icon: package-variant-closed
   source: ((input-resource-source))
 
 - name: ((buildpack-name))-test-app
   type: ((test-app-type))
-  #icon: github
+  icon: github
   source: ((test-app-source))
 
 - name: ((buildpack-name))-artifactory-output
   type: artifactory
-  #icon: package-variant-closed
+  icon: package-variant-closed
   source:
     endpoint: ((artifactory-endpoint))
     repository: ((artifactory-repo))
@@ -30,7 +42,7 @@ resources:
 
 - name: ((buildpack-name))-artifactory
   type: artifactory
-  #icon: package-variant-closed
+  icon: package-variant-closed
   source:
     endpoint: ((artifactory-endpoint))
     repository: ((artifactory-repo))
@@ -42,8 +54,7 @@ resources:
 jobs:
 - name: regulator
   plan:
-  #- in_parallel:
-  - aggregate:
+  - in_parallel:
     - (( append ))
     - get: ((buildpack-name))
       params: { globs: [] }
@@ -60,12 +71,12 @@ jobs:
   - put: ((buildpack-name))-artifactory-output
     params:
       file: ((buildpack-name))/((buildpack-ls))
+    get_params: {skip_download: true}
 
 - name: stage-((buildpack-name))
   serial_groups: [cc-api]
   plan:
-  #- in_parallel:
-  - aggregate:
+  - in_parallel:
     - get: buildpack-mgmt-pipelines
     - get: ((buildpack-name))-artifactory
     - get: buildpack-mgmt-cmdb
@@ -79,8 +90,7 @@ jobs:
 - name: test-((buildpack-name))
   serial_groups: [cc-api]
   plan:
-  #- in_parallel:
-  - aggregate:
+  - in_parallel:
     - get: buildpack-mgmt-pipelines
     - get: ((buildpack-name))-test-app
       passed: ((test-app-passed))
@@ -106,8 +116,7 @@ jobs:
 - name: promote-((buildpack-name))
   serial_groups: [cc-api]
   plan:
-  #- in_parallel:
-  - aggregate:
+  - in_parallel:
     - get: buildpack-mgmt-pipelines
     - get: buildpack-mgmt-cmdb
       trigger: true

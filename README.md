@@ -11,15 +11,15 @@ And it also provides a way to roll back to a previous buildpack version when the
 ## Quick Start
 
 1. Setup your Concourse environment and other support tools (Artifactory, RocketChat).
-2. Define a set of buildpack versions in CMDB repository.
-3. Place your buildpack configurations inside the `buildpacks/` folder.
-4. Install the requirement command line tools:
+2. Place your buildpack configurations inside the `buildpacks/` folder.
+3. Install the requirement command line tools:
    * [bosh-cli](https://github.com/cloudfoundry/bosh-cli)
    * [spruce](https://github.com/geofffranks/spruce)
    * fly (download from your Concourse installation)
-5. Execute `./build-pipeline.sh`
-6. Login to Concourse with the `fly` CLI
-7. Upload the pipeline `buildpack-installation-pipeline.yml` to Concourse.
+4. Execute `./build-pipeline.sh`
+5. Login to Concourse with the `fly` CLI
+6. Upload the pipeline `buildpack-installation-pipeline.yml` to Concourse.
+7. Define a set of buildpack versions in CMDB repository.
 
 ## CredHub Settings
 

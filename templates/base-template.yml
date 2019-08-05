@@ -18,7 +18,7 @@ resource_types:
 resources:
 - name:  buildpack-mgmt-pipelines
   type: git
-  #icon: github
+  icon: github
   source:
     uri: ((buildpack-mgmt-pipelines-url))
     branch: master
@@ -28,7 +28,7 @@ resources:
 
 - name: buildpack-mgmt-cmdb
   type: git
-  #icon: github
+  icon: github
   source:
     uri: ((buildpack-mgmt-cmdb-url))
     username: ((git-username))
@@ -37,7 +37,7 @@ resources:
 
 - name: rocketchat
   type: rocketchat
-  #icon: chat
+  icon: chat
   source:
     url: ((rocket-chat-url))
     user: ((rocket-chat-username))
@@ -47,8 +47,7 @@ jobs:
 - name: trigger-buildpack-update
   serial_groups: [cc-api]
   plan:
-  #- in_parallel:
-  - aggregate:
+  - in_parallel:
     - get: buildpack-mgmt-cmdb
       trigger: true
     - get: buildpack-mgmt-pipelines
