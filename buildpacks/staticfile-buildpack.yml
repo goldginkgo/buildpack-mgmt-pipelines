@@ -5,8 +5,8 @@ input-resource-source:
   api_token: ((pivnet-token))
   product_slug: staticfile-buildpack
   product_version: \d+\.\d+\.\d+
-buildpack-regex-output: staticfile_buildpack-cached-((stack))-v(?<version>.*).zip
-buildpack-regex: staticfile_buildpack.*((stack))-v(?<version>.*).zip
+buildpack-regex-output: staticfile_buildpack-cached-((stack))-v(.*).zip
+buildpack-regex: staticfile_buildpack.*((stack))-v(.*).zip
 buildpack-ls: staticfile_buildpack-cached-((stack))-v*.zip
 test-app-type: git
 test-app-source:

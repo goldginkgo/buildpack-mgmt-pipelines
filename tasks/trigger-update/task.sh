@@ -26,10 +26,10 @@ if [ $BUILDPACK_VERSION != $DESIRED_VERSION ]; then
   cat ./original-pipeline.yml
 
   # DESIRED_VERSION=3.15
-  # staticfile_buildpack-cached-cflinuxfs3-v(?<version>3.16.*).zip ->(no change) staticfile_buildpack-cached-cflinuxfs3-v(?<version>3.16.*).zip
-  # staticfile_buildpack-.*-cflinuxfs3-v(?<version>.*).zip -> staticfile_buildpack.*cflinuxfs3-v(?<version>3.15.*).zip
-  # staticfile_buildpack.*cflinuxfs3-v(?<version>3.16.*).zip -> staticfile_buildpack.*cflinuxfs3-v(?<version>3.15.*).zip
-  sed "s/staticfile_buildpack\.\*cflinuxfs3-v(?<version>.*).zip/staticfile_buildpack.*cflinuxfs3-v(?<version>$DESIRED_VERSION.*).zip/" ./original-pipeline.yml > ./updated-pipeline.yml
+  # staticfile_buildpack-cached-cflinuxfs3-v(3.16.*).zip ->(no change) staticfile_buildpack-cached-cflinuxfs3-v(3.16.*).zip
+  # staticfile_buildpack.*cflinuxfs3-v(.*).zip -> staticfile_buildpack.*cflinuxfs3-v(3.15.*).zip
+  # staticfile_buildpack.*cflinuxfs3-v(3.16.*).zip -> staticfile_buildpack.*cflinuxfs3-v(3.15.*).zip
+  sed "s/staticfile_buildpack\.\*cflinuxfs3-v(.*).zip/staticfile_buildpack.*cflinuxfs3-v($DESIRED_VERSION.*).zip/" ./original-pipeline.yml > ./updated-pipeline.yml
 
   ./fly -t target set-pipeline -p $PIPELINE -c ./updated-pipeline.yml -n
 

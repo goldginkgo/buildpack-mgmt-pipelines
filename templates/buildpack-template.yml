@@ -26,30 +26,32 @@ resources:
 
 - name: ((buildpack-name))-test-app
   type: ((test-app-type))
-  icon: github
+  icon: github-circle
   source: ((test-app-source))
 
-- name: ((buildpack-name))-artifactory-output
-  type: artifactory
+- name: ((buildpack-name))-s3-output
+  type: s3
   icon: package-variant-closed
   source:
-    endpoint: ((artifactory-endpoint))
-    repository: ((artifactory-repo))
-    regex: ((buildpack-regex-output))
-    username: ((artifactory-username))
-    password: ((artifactory-password))
-    skip_ssl_verification: true
+    endpoint: ((s3-minio-endpoint))
+    bucket: ((s3-bucket))
+    regexp: ((buildpack-regex-output))
+    access_key_id: ((s3-access-key-id))
+    secret_access_key: ((s3-secret-access-key))
+    disable_ssl: true
+    #skip_ssl_verification: true
 
-- name: ((buildpack-name))-artifactory
-  type: artifactory
+- name: ((buildpack-name))-s3
+  type: s3
   icon: package-variant-closed
   source:
-    endpoint: ((artifactory-endpoint))
-    repository: ((artifactory-repo))
-    regex: ((buildpack-regex))
-    username: ((artifactory-username))
-    password: ((artifactory-password))
-    skip_ssl_verification: true
+    endpoint: ((s3-minio-endpoint))
+    bucket: ((s3-bucket))
+    regexp: ((buildpack-regex))
+    access_key_id: ((s3-access-key-id))
+    secret_access_key: ((s3-secret-access-key))
+    disable_ssl: true
+    #skip_ssl_verification: true
 
 jobs:
 - name: regulator
@@ -68,21 +70,20 @@ jobs:
     trigger: true
     passed:
     - regulator
-  - put: ((buildpack-name))-artifactory-output
+  - put: ((buildpack-name))-s3-output
     params:
       file: ((buildpack-name))/((buildpack-ls))
-    get_params: {skip_download: true}
 
 - name: stage-((buildpack-name))
   serial_groups: [cc-api]
   plan:
   - in_parallel:
     - get: buildpack-mgmt-pipelines
-    - get: ((buildpack-name))-artifactory
+    - get: ((buildpack-name))-s3
     - get: buildpack-mgmt-cmdb
   - task: upload-buildpack
     file: buildpack-mgmt-pipelines/tasks/stage-buildpack/task.yml
-    input_mapping: {buildpack: ((buildpack-name))-artifactory}
+    input_mapping: {buildpack: ((buildpack-name))-s3}
     params:
       BUILDPACK_NAME: ((cf-staging-buildpack-name))
       <<: *cf_params
