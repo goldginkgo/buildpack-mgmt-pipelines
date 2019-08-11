@@ -10,7 +10,7 @@ And it also provides a way to roll back to a previous buildpack version when the
 
 ## Quick Start
 
-1. Setup your Concourse environment and other software dependancies (Amazon S3 Compatible Object Storage Minio, RocketChat).
+1. Setup your Concourse environment and other software dependancies (Minio, RocketChat, Credhub).
 2. Place your buildpack configurations inside the `buildpacks/` folder.
 3. Install the requirement command line tools:
    * [bosh-cli](https://github.com/cloudfoundry/bosh-cli)
@@ -60,3 +60,49 @@ Add the following variables to your CredHub installation with the specific team 
 
 For the login to the pivotal network, you need a token from the [Pivotal Network](https://network.pivotal.io/).
 There you can go to the profile and request a token (the deprecated token).
+
+
+## Technical details
+
+### Define desired buildpack Version (CMDB)
+Desired buildpacks versions are defined in a Git file like the following, whenever there is a change in the file, our pipelines will be triggered to update buildpacks.
+```
+staticfile_buildpack: 1.4.42
+go_buildpack: 1.25
+ruby_buildpack: 2.5
+```
+
+### Supported buildpacks
+Buildpacks supported by the pipelines are defined in buildpacks folder. A new file should be added if you want to support new buildpacks. Here is an example of the file:
+```
+buildpack-name: staticfile-buildpack
+human-readable-name: Staticfile Buildpack
+input-resource-type: pivnet
+input-resource-source:
+  api_token: ((pivnet-token))
+  product_slug: staticfile-buildpack
+  product_version: \d+\.\d+\.\d+
+buildpack-regex-output: staticfile_buildpack-cached-((stack))-v(.*).zip
+buildpack-regex: staticfile_buildpack.*((stack))-v(.*).zip
+buildpack-ls: staticfile_buildpack-cached-((stack))-v*.zip
+test-app-type: git
+test-app-source:
+  uri: ((cf-test-app-staticfile-url))
+  branch: master
+  username: ((git-username))
+  password: ((git-password))
+  skip_ssl_verification: true
+test-app-passed: []
+cf-staging-buildpack-name: staticfile_buildpack_staging
+cf-buildpack-name: staticfile_buildpack
+```
+
+### Pipeline tasks
+- download buildpack: Download Buildpacks from Pivotal Network and store in Minio.
+- build customized buildpacks: Compile customized buildpacks from downloaded buildpack and store in Minio
+- build Java app: Compile Java test app from source code and store jar file to Minio.
+
+- trigger buildpack: Whenever buildpack CMDB is updated, check desired version and current version in our environment, update our pipelines with correct versions and trigger the tasks to update buildpack. Buildpacks will be updated one by one.
+- stage buildpack: Stage a new buildpack with desired version in our environment. e.g. a new buildpack called staticfile_buildpack_stage will be added at the last position if staticfile buildpack are to be updated.
+- test buildpack: Deploy a testing app with our test app and the staged buildpack in our Cloud Foundry environment. Send requests to defined endpoints to test apps.
+- promote buildpack: Delete the old buildpack(staticfile_buildpack), rename the staged buildpack (staticfile_buildpack_stage -> staticfile_buildpack) and put the buldpack to the old position. Send a notification to RocketChat when finished.
