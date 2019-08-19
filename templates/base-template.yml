@@ -66,3 +66,4 @@ jobs:
       CF_USERNAME: ((cf-username))
       CF_PASSWORD: ((cf-password))
       PIPELINE: ((pipeline))
+      ENV: ((environment))

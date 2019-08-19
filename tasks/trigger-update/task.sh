@@ -19,8 +19,8 @@ cf buildpacks | grep cflinuxfs3 > current_buildpacks.txt
 TRIGGER_JOB_FILE=job-$(date +%Y%m%d-%H%M).txt
 > $TRIGGER_JOB_FILE
 
-cat buildpack-mgmt-cmdb/dev1.yml | while read LINE
-do 
+cat buildpack-mgmt-cmdb/$ENV.yml | while read LINE
+do
   echo $LINE
   BUILDPACK=$(echo $LINE | awk -F':' '{print $1}')
   # TODO display erro when buildpack not found

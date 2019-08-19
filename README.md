@@ -69,34 +69,35 @@ There you can go to the profile and request a token (the deprecated token).
 ### Define desired buildpack Version (CMDB)
 Desired buildpacks versions are defined in a Git file like the following, whenever there is a change in the file, our pipelines will be triggered to update buildpacks.
 ```
-staticfile_buildpack: 1.4.42
-go_buildpack: 1.25
-ruby_buildpack: 2.5
+binary_buildpack: 1.0.32
+go_buildpack: 1.8.42
+nodejs_buildpack: 1.6.53
+ruby_buildpack: 1.7.42
 ```
 
 ### Supported buildpacks
 Buildpacks supported by the pipelines are defined in buildpacks folder. A new file should be added if you want to support new buildpacks. Here is an example of the file:
 ```
-buildpack-name: staticfile-buildpack
-human-readable-name: Staticfile Buildpack
+buildpack-name: go-buildpack
+human-readable-name: Go Buildpack
 input-resource-type: pivnet
 input-resource-source:
   api_token: ((pivnet-token))
-  product_slug: staticfile-buildpack
+  product_slug: go-buildpack
   product_version: \d+\.\d+\.\d+
-buildpack-regex-output: staticfile_buildpack-cached-((stack))-v(.*).zip
-buildpack-regex: staticfile_buildpack.*((stack))-v(.*).zip
-buildpack-ls: staticfile_buildpack-cached-((stack))-v*.zip
+buildpack-regex-output: go_buildpack-cached-((stack))-v(.*).zip
+buildpack-regex: go_buildpack.*((stack))-v(.*).zip
+buildpack-ls: go_buildpack-cached-((stack))-v*.zip
 test-app-type: git
 test-app-source:
-  uri: ((cf-test-app-staticfile-url))
+  uri: ((cf-test-app-go-url))
   branch: master
   username: ((git-username))
   password: ((git-password))
   skip_ssl_verification: true
 test-app-passed: []
-cf-staging-buildpack-name: staticfile_buildpack_staging
-cf-buildpack-name: staticfile_buildpack
+cf-staging-buildpack-name: go_buildpack_staging
+cf-buildpack-name: go_buildpack
 ```
 
 ### Pipeline tasks

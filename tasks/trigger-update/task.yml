@@ -18,3 +18,4 @@ params:
   CF_USERNAME:
   CF_PASSWORD:
   PIPELINE:
+  ENV:
