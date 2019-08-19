@@ -32,35 +32,37 @@ Add the following variables to your CredHub installation with the specific team 
 |-------------------------------|----------|---------------------------------------------------------------------------------------------|
 | buildpack-mgmt-pipelines-url  | value    | https://github.com/goldginkgo/buildpack-mgmt-pipelines                                      |
 | buildpack-mgmt-cmdb-url       | value    | https://github.com/goldginkgo/buildpack-mgmt-cmdb                                           |
-| cf-test-app-staticfile-url    | value    | https://github.com/goldginkgo/cf-test-app-staticfile.git                                    |
+| cf-test-app-go-url            | value    | https://github.com/goldginkgo/cf-test-app-go.git                                            |
+| cf-test-app-ruby-url          | value    | https://github.com/goldginkgo/cf-test-app-ruby.git                                          |
+| cf-test-app-nodejs-url        | value    | https://github.com/goldginkgo/cf-test-app-nodejs.git                                        |
+| cf-test-app-binary-url        | value    | https://github.com/goldginkgo/cf-test-app-binary.git                                        |
 | git-username                  | value    |                                                                                             |
 | git-password                  | password |                                                                                             |
-| cf-api-uri                    | value    | https://api.`<domain>`                                                                      |
-| cf-apps-url                   | value    | apps.`<domain>`                                                                             |
+| cf-api-uri                    | value    |                                                                                             |
+| cf-apps-url                   | value    |                                                                                             |
 | cf-username                   | value    |                                                                                             |
 | cf-password                   | password |                                                                                             |
-| cf-organization               | value    | system                                                                                      |
-| cf-space                      | value    | buildpack_test                                                                              |
+| cf-organization               | value    |                                                                                             |
+| cf-space                      | value    |                                                                                             |
 | s3-minio-endpoint             | password |                                                                                             |
 | s3-access-key-id              | password |                                                                                             |
 | s3-secret-access-key          | password |                                                                                             |
-| s3-bucket                     | value    | buildapcks                                                                                  |
+| s3-bucket                     | value    |                                                                                             |
 | pivnet-token                  | password |                                                                                             |
-| rocket-chat-url               | value    | https://rocketchat.`<domain>`                                                               |
+| rocket-chat-url               | value    |                             `                                                               |
 | rocket-chat-username          | value    |                                                                                             |
 | rocket-chat-password          | password |                                                                                             |
-| channel                       | value    | buildpack_mgmt_test                                                                         |
+| channel                       | value    |                                                                                             |
 | stack                         | value    | cflinuxfs3                                                                                  |
 | environment                   | value    | QA                                                                                          |
-| fly-host                      | value    | http://`<ip>`:8080                                                                          |
-| fly-team                      | value    | main                                                                                        |
+| fly-host                      | value    |                                                                                             |
+| fly-team                      | value    |                                                                                             |
 | fly-username                  | value    |                                                                                             |
 | fly-password                  | password |                                                                                             |
 | pipeline                      | value    | buildpack-mgmt                                                                              |
 
 For the login to the pivotal network, you need a token from the [Pivotal Network](https://network.pivotal.io/).
 There you can go to the profile and request a token (the deprecated token).
-
 
 ## Technical details
 

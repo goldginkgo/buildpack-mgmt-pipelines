@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -eux
 #set -o pipefail
 
 #echo "...Show environment variables..."
@@ -16,6 +16,7 @@ cf target -o $CF_ORG -s $CF_SPACE
 
 set +e
 echo "...Validate / for the test app..."
+curl -L https://$APP_NAME.$CF_APP_URL --insecure
 curl -L https://$APP_NAME.$CF_APP_URL --insecure | grep 'Hello World!' &> /dev/null
 retVal=$?
 set -e

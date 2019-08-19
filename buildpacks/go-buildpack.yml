@@ -1,0 +1,20 @@
+buildpack-name: go-buildpack
+human-readable-name: Go Buildpack
+input-resource-type: pivnet
+input-resource-source:
+  api_token: ((pivnet-token))
+  product_slug: go-buildpack
+  product_version: \d+\.\d+\.\d+
+buildpack-regex-output: go_buildpack-cached-((stack))-v(.*).zip
+buildpack-regex: go_buildpack.*((stack))-v(.*).zip
+buildpack-ls: go_buildpack-cached-((stack))-v*.zip
+test-app-type: git
+test-app-source:
+  uri: ((cf-test-app-go-url))
+  branch: master
+  username: ((git-username))
+  password: ((git-password))
+  skip_ssl_verification: true
+test-app-passed: []
+cf-staging-buildpack-name: go_buildpack_staging
+cf-buildpack-name: go_buildpack

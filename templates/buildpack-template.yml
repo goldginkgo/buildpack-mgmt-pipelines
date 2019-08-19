@@ -1,11 +1,11 @@
 groups:
 - name: download_buildpack
   jobs:
-  - regulator
+  - (( append ))
   - download-((buildpack-name))
 - name: update_buildpack
   jobs:
-  - trigger-buildpack-update
+  - (( append ))
   - stage-((buildpack-name))
   - test-((buildpack-name))
   - promote-((buildpack-name))

@@ -1,0 +1,20 @@
+buildpack-name: nodejs-buildpack
+human-readable-name: Nodejs Buildpack
+input-resource-type: pivnet
+input-resource-source:
+  api_token: ((pivnet-token))
+  product_slug: nodejs-buildpack
+  product_version: \d+\.\d+\.\d+
+buildpack-regex-output: nodejs_buildpack-cached-((stack))-v(.*).zip
+buildpack-regex: nodejs_buildpack.*((stack))-v(.*).zip
+buildpack-ls: nodejs_buildpack-cached-((stack))-v*.zip
+test-app-type: git
+test-app-source:
+  uri: ((cf-test-app-nodejs-url))
+  branch: master
+  username: ((git-username))
+  password: ((git-password))
+  skip_ssl_verification: true
+test-app-passed: []
+cf-staging-buildpack-name: nodejs_buildpack_staging
+cf-buildpack-name: nodejs_buildpack

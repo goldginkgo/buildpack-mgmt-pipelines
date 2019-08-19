@@ -1,0 +1,20 @@
+buildpack-name: ruby-buildpack
+human-readable-name: Ruby Buildpack
+input-resource-type: pivnet
+input-resource-source:
+  api_token: ((pivnet-token))
+  product_slug: ruby-buildpack
+  product_version: \d+\.\d+\.\d+
+buildpack-regex-output: ruby_buildpack-cached-((stack))-v(.*).zip
+buildpack-regex: ruby_buildpack.*((stack))-v(.*).zip
+buildpack-ls: ruby_buildpack-cached-((stack))-v*.zip
+test-app-type: git
+test-app-source:
+  uri: ((cf-test-app-ruby-url))
+  branch: master
+  username: ((git-username))
+  password: ((git-password))
+  skip_ssl_verification: true
+test-app-passed: []
+cf-staging-buildpack-name: ruby_buildpack_staging
+cf-buildpack-name: ruby_buildpack

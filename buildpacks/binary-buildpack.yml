@@ -1,0 +1,20 @@
+buildpack-name: binary-buildpack
+human-readable-name: Binary Buildpack
+input-resource-type: pivnet
+input-resource-source:
+  api_token: ((pivnet-token))
+  product_slug: binary-buildpack
+  product_version: \d+\.\d+\.\d+
+buildpack-regex-output: binary_buildpack-cached-((stack))-v(.*).zip
+buildpack-regex: binary_buildpack.*((stack))-v(.*).zip
+buildpack-ls: binary_buildpack-cached-((stack))-v*.zip
+test-app-type: git
+test-app-source:
+  uri: ((cf-test-app-binary-url))
+  branch: master
+  username: ((git-username))
+  password: ((git-password))
+  skip_ssl_verification: true
+test-app-passed: []
+cf-staging-buildpack-name: binary_buildpack_staging
+cf-buildpack-name: binary_buildpack

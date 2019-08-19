@@ -1,3 +1,11 @@
+groups:
+- name: download_buildpack
+  jobs:
+  - regulator
+- name: update_buildpack
+  jobs:
+  - trigger-buildpack-update
+
 resource_types:
 - name: pivnet
   type: docker-image
@@ -26,6 +34,7 @@ resources:
   icon: github-circle
   source:
     uri: ((buildpack-mgmt-cmdb-url))
+    branch: master
     username: ((git-username))
     password: ((git-password))
     skip_ssl_verification: true
